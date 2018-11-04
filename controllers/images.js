@@ -3,11 +3,14 @@ const Images = require('../lib/images');
 exports.create = (req, res) => {
   const { file } = req;
   Promise.all([
-    Images.createMain(file),
-    Images.createThumbnail(file),
+    Images.upload(file, 'main'),
+    Images.upload(file, 'thumbnail'),
   ])
-    .then(() => {
-      res.sendStatus(201);
+    .then(([main, thumbnail]) => {
+      res.status(201).json({
+        main,
+        thumbnail,
+      });
     })
     .catch(() => {
       res.sendStatus(500);
