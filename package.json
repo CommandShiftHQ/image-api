@@ -4,8 +4,9 @@
   "description": "Manchester Codes Image Sharing App API",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
-    "dev": "nodemon -r dotenv/config index.js"
+    "start": "node src/index.js",
+    "dev": "nodemon -r dotenv/config src/index.js",
+    "lint": "eslint src"
   },
   "author": "Michael Harrison",
   "private": true,
