@@ -2,16 +2,16 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 
 const login = (req, res) => {
-  User.findOne({ email: req.body.email })
+  User.findOne({ username: req.body.username })
     .then((user) => {
       if (!user) {
         res.status(401).json({
-          message: 'User not found with given email address.',
+          message: 'User not found.',
         });
       } else {
         if (user.validatePassword(req.body.password)) {
           const payload = {
-            _id: user._id,
+            username: user.username,
           };
 
           jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {

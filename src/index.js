@@ -14,6 +14,8 @@ app.use('/auth', routes.auth);
 app.use('/users', routes.users);
 app.use('/images', routes.images);
 
-mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true }, () => {
+mongoose.connect(process.env.DATABASE_URL, {
+  useNewUrlParser: true,
+}, () => {
   app.listen(process.env.PORT || 3000);
 });
