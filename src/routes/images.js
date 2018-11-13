@@ -7,6 +7,7 @@ const ImageController = require('../controllers/images');
 const router = express.Router();
 
 router.route('/')
+  .get(ImageController.index)
   .post(authenticate, multer().single('image'), checkMimetype, ImageController.create);
 
 module.exports = router;

@@ -28,7 +28,15 @@ const userSchema = new mongoose.Schema({
     ],
     set: password => bcrypt.hashSync(password, 10),
   },
-}, { autoIndex: false });
+}, {
+  autoIndex: false,
+});
+
+userSchema.virtual('images', {
+  ref: 'Image',
+  localField: 'username',
+  foreignField: 'user',
+});
 
 userSchema.methods.validatePassword = function validatePassword(password) {
   return bcrypt.compareSync(password, this.password);

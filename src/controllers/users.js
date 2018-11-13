@@ -1,22 +1,34 @@
 const User = require('../models/user');
 
-const create = (req, res) => {
-  const user = new User({
-    firstName: req.body.firstName,
-    lastName: req.body.lastName,
-    username: req.body.username,
-    password: req.body.password,
-  });
+exports.create = async (req, res) => {
+  try {
+    const user = await new User({
+      firstName: req.body.firstName,
+      lastName: req.body.lastName,
+      username: req.body.username,
+      password: req.body.password,
+    }).save();
 
-  user.save()
-    .then((data) => {
-      res.status(201).json(data);
-    })
-    .catch(() => {
-      res.sendStatus(500);
-    });
+    const { password, ...payload } = user.toObject();
+
+    res.status(201).json(payload);
+  } catch (error) {
+    res.sendStatus(500);
+  }
 };
 
-module.exports = {
-  create,
+exports.find = async (req, res) => {
+  try {
+    const { params: { username } } = req;
+    const user = await User.findOne({ username })
+      .populate('images')
+      .select('-password')
+      .exec();
+
+    const payload = user.toObject({ virtuals: true });
+
+    res.json(payload);
+  } catch (error) {
+    res.sendStatus(500);
+  }
 };

@@ -14,7 +14,7 @@ const login = (req, res) => {
             username: user.username,
           };
 
-          jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1h' }, (err, token) => {
+          jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '1w' }, (err, token) => {
             if (err) {
               res.sendStatus(500);
             } else {
