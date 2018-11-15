@@ -10,4 +10,8 @@ router.route('/')
   .get(getAuthorizer, ImageController.index)
   .post(authenticate, multer().single('image'), checkMimetype, ImageController.create);
 
+router.route('/:id')
+  .patch(authenticate, ImageController.update)
+  .delete(authenticate, ImageController.delete);
+
 module.exports = router;
