@@ -5,7 +5,7 @@ const router = express.Router();
 
 router.route('/')
   .get(MeController.profile)
-  .patch(MeController.update)
+  .patch(MeController.update) // TODO: add updating avatar
   .delete(MeController.delete);
 
 module.exports = router;
