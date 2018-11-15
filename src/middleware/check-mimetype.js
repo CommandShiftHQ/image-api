@@ -6,7 +6,7 @@ const mimetypes = [
 ];
 
 const checkMimetype = (req, res, next) => {
-  if (mimetypes.includes(req.file.mimetype)) {
+  if ((!req.file) || mimetypes.includes(req.file.mimetype)) {
     next();
   } else {
     res.sendStatus(415);

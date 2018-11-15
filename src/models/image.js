@@ -12,7 +12,8 @@ const imageSchema = new mongoose.Schema({
   likedBy: {
     type: [String],
   },
-}, { timestamps: true });
+  timestamp: Number,
+});
 
 imageSchema.static('findByUser', function findByUser(user) {
   return this.find({ user });

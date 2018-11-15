@@ -1,7 +1,10 @@
+const moment = require('moment');
 const Image = require('../models/image');
-const Images = require('../lib/images');
+const ImageUtils = require('../lib/images');
 
 exports.index = async (req, res) => {
+  const { username } = req.authorizer;
+
   try {
     let tags = null;
     if (req.query.tags) {
@@ -15,7 +18,15 @@ exports.index = async (req, res) => {
       images = await Image.find({});
     }
 
-    const payload = images.map(image => image.toObject());
+    const payload = images.map(image => {
+      const {
+        id, __v, likedBy, ...img
+      } = image.toObject({ virtuals: true });
+      return {
+        ...img,
+        isLiked: username ? image.isLikedBy(username) : false,
+      };
+    });
 
     res.status(200).json(payload);
   } catch (error) {
@@ -32,22 +43,24 @@ exports.create = async (req, res) => {
     } = req;
 
     const [src, thumb] = await Promise.all([
-      Images.upload(file, 'main'),
-      Images.upload(file, 'thumbnail'),
+      ImageUtils.upload(file, username, 'main'),
+      ImageUtils.upload(file, username, 'thumbnail'),
     ]);
 
     const image = await new Image({
-      user: username,
       src,
       thumb,
       caption,
       tags,
+      user: username,
+      timestamp: moment.utc().valueOf(),
     }).save();
 
-    const { likedBy, ...payload } = image.toObject();
+    const {
+      id, __v, likedBy, ...payload
+    } = image.toObject({ virtuals: true });
 
-    payload.likes = image.likes;
-    payload.liked = image.isLikedBy(username);
+    payload.isLiked = image.isLikedBy(username);
 
     res.status(201).json(payload);
   } catch (error) {

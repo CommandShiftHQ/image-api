@@ -28,6 +28,10 @@ const userSchema = new mongoose.Schema({
     ],
     set: password => bcrypt.hashSync(password, 10),
   },
+  avatar: {
+    type: String,
+    default: `https://s3-eu-west-1.amazonaws.com/${process.env.S3_BUCKET_NAME}/avatar.jpeg`,
+  },
 }, {
   autoIndex: false,
 });

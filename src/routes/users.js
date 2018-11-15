@@ -1,12 +1,15 @@
 const express = require('express');
+const multer = require('multer');
+const checkMimetype = require('../middleware/check-mimetype');
+const { getAuthorizer } = require('../middleware/authenticate');
 const UsersController = require('../controllers/users');
 
 const router = express.Router();
 
 router.route('/')
-  .post(UsersController.create);
+  .post(multer().single('avatar'), checkMimetype, UsersController.create);
 
 router.route('/:username')
-  .get(UsersController.find);
+  .get(getAuthorizer, UsersController.find);
 
 module.exports = router;

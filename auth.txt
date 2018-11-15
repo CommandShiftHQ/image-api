@@ -1,0 +1,12 @@
+google auth
+
+https://accounts.google.com/o/oauth2/v2/auth?
+ scope=https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email&
+ redirect_uri=http://localhost:8080/google-auth&
+ client_id={client_id}
+
+success:
+http://localhost:8080/google-auth?code={code}
+http://localhost:8080/google-auth?error=access_denied
+
+extract this from the url and send to the server

@@ -9,9 +9,12 @@ exports.profile = async (req, res) => {
       .select('-password')
       .exec();
 
-    const payload = user.toObject({ virtuals: true });
-
-    res.json(payload);
+    if (!user) {
+      res.sendStatus(404);
+    } else {
+      const { id, __v, ...payload } = user.toObject({ virtuals: true });
+      res.status(200).json(payload);
+    }
   } catch (error) {
     res.sendStatus(500);
   }
