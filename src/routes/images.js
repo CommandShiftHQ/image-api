@@ -4,6 +4,7 @@ const checkMimetype = require('../middleware/check-mimetype');
 const { authenticate, getAuthorizer } = require('../middleware/authenticate');
 const ImageController = require('../controllers/images');
 const CommentController = require('../controllers/comments');
+const LikeController = require('../controllers/likes');
 
 const router = express.Router();
 
@@ -22,6 +23,7 @@ router.route('/:id/comments')
 router.route('/:id/comments/:commentId')
   .delete(authenticate, CommentController.delete);
 
-// TODO: add likes / dislikes
+router.route('/:id/likes')
+  .patch(authenticate, LikeController.toggle);
 
 module.exports = router;

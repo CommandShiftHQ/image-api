@@ -40,6 +40,16 @@ imageSchema.method('isLikedBy', function isLikedBy(user) {
   return this.likedBy.includes(user);
 });
 
+imageSchema.method('like', function like(user) {
+  this.likedBy.addToSet(user);
+  return this;
+});
+
+imageSchema.method('unlike', function unlike(user) {
+  this.likedBy.pull(user);
+  return this;
+});
+
 const Image = mongoose.model('Image', imageSchema);
 
 module.exports = Image;
