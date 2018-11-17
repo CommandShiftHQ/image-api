@@ -19,15 +19,39 @@ exports.index = async (req, res) => {
 
   const payload = images.map(image => {
     const {
-      id, __v, likedBy, ...img
+      id, __v, likedBy, comments, ...img
     } = image.toObject({ virtuals: true });
     return {
       ...img,
+      comments: comments.map(({ id, ...comment }) => comment), // eslint-disable-line no-shadow
       isLiked: username ? image.isLikedBy(username) : false,
     };
   });
 
   res.status(200).json(payload);
+};
+
+exports.find = async (req, res) => {
+  const {
+    authorizer: { username },
+    params: { id },
+  } = req;
+
+  const image = await Image.findById(id);
+
+  if (!image) {
+    res.sendStatus(404);
+  } else {
+    const {
+      id, __v, likedBy, comments, ...payload // eslint-disable-line no-shadow
+    } = image.toObject({ virtuals: true });
+
+    res.status(200).json({
+      ...payload,
+      comments: comments.map(({ id, ...comment }) => comment), // eslint-disable-line no-shadow
+      isLiked: username ? image.isLikedBy(username) : false,
+    });
+  }
 };
 
 exports.create = async (req, res) => {
@@ -85,12 +109,14 @@ exports.update = async (req, res) => {
 
     {
       const {
-        id, __v, likedBy, ...payload // eslint-disable-line no-shadow
+        id, __v, likedBy, comments, ...payload // eslint-disable-line no-shadow
       } = image.toObject({ virtuals: true });
 
-      payload.isLiked = image.isLikedBy(username);
-
-      res.status(200).json(payload);
+      res.status(200).json({
+        ...payload,
+        isLiked: image.isLikedBy(username),
+        comments: comments.map(({ id, ...comment }) => comment), // eslint-disable-line no-shadow
+      });
     }
   }
 };

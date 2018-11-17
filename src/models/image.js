@@ -12,6 +12,15 @@ const imageSchema = new mongoose.Schema({
   likedBy: {
     type: [String],
   },
+  comments: [{
+    content: {
+      type: String,
+      required: [true, 'Comment text is required'],
+      minlength: [1, 'Comment text is required'],
+    },
+    author: String,
+    timestamp: Number,
+  }],
   timestamp: Number,
 });
 
