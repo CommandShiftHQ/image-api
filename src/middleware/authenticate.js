@@ -8,7 +8,7 @@ exports.authenticate = (req, res, next) => {
       if (error) {
         res.status(401).json({ message: 'Unable to authenticate token' });
       } else {
-        req.authorizer = { username: authorizer.username };
+        req.authorizer = { id: authorizer._id };
         next();
       }
     });
@@ -23,13 +23,13 @@ exports.getAuthorizer = (req, res, next) => {
   if (token) {
     jwt.verify(token, process.env.JWT_SECRET, (error, authorizer) => {
       if (error) {
-        req.authorizer = { username: null };
+        req.authorizer = { id: null };
       } else {
-        req.authorizer = { username: authorizer.username };
+        req.authorizer = { id: authorizer._id };
       }
     });
   } else {
-    req.authorizer = { username: null };
+    req.authorizer = { id: null };
   }
   next();
 };

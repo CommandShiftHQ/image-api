@@ -24,10 +24,6 @@ const imageSchema = new mongoose.Schema({
   timestamp: Number,
 });
 
-imageSchema.static('findByUser', function findByUser(user) {
-  return this.find({ user });
-});
-
 imageSchema.static('findByTags', function findByTags(tags) {
   return this.find({ tags: { $in: tags } });
 });

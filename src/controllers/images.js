@@ -3,11 +3,11 @@ const Image = require('../models/image');
 const ImageUtils = require('../lib/images');
 
 exports.index = async (req, res) => {
-  const { username } = req.authorizer;
+  const { authorizer, query } = req;
 
   let tags = null;
-  if (req.query.tags) {
-    tags = [].concat(req.query.tags);
+  if (query.tags) {
+    tags = [].concat(query.tags);
   }
 
   let images;
@@ -24,7 +24,7 @@ exports.index = async (req, res) => {
     return {
       ...img,
       comments: comments.map(({ id, ...comment }) => comment), // eslint-disable-line no-shadow
-      isLiked: username ? image.isLikedBy(username) : false,
+      isLiked: authorizer.id ? image.isLikedBy(authorizer.id) : false,
     };
   });
 
@@ -33,11 +33,11 @@ exports.index = async (req, res) => {
 
 exports.find = async (req, res) => {
   const {
-    authorizer: { username },
-    params: { id },
+    authorizer,
+    params,
   } = req;
 
-  const image = await Image.findById(id);
+  const image = await Image.findById(params.id);
 
   if (!image) {
     res.sendStatus(404);
@@ -49,7 +49,7 @@ exports.find = async (req, res) => {
     res.status(200).json({
       ...payload,
       comments: comments.map(({ id, ...comment }) => comment), // eslint-disable-line no-shadow
-      isLiked: username ? image.isLikedBy(username) : false,
+      isLiked: authorizer.id ? image.isLikedBy(authorizer.id) : false,
     });
   }
 };
@@ -57,13 +57,13 @@ exports.find = async (req, res) => {
 exports.create = async (req, res) => {
   const {
     file,
+    authorizer,
     body: { caption, tags },
-    authorizer: { username },
   } = req;
 
   const [src, thumb] = await Promise.all([
-    ImageUtils.upload(file, username, 'main'),
-    ImageUtils.upload(file, username, 'thumbnail'),
+    ImageUtils.upload(file, authorizer.id, 'main'),
+    ImageUtils.upload(file, authorizer.id, 'thumbnail'),
   ]);
 
   const image = await new Image({
@@ -71,7 +71,7 @@ exports.create = async (req, res) => {
     thumb,
     caption,
     tags,
-    user: username,
+    user: authorizer.id,
     timestamp: moment.utc().valueOf(),
   }).save();
 
@@ -79,23 +79,23 @@ exports.create = async (req, res) => {
     id, __v, likedBy, ...payload
   } = image.toObject({ virtuals: true });
 
-  payload.isLiked = image.isLikedBy(username);
+  payload.isLiked = image.isLikedBy(authorizer.id);
 
   res.status(201).json(payload);
 };
 
 exports.update = async (req, res) => {
   const {
-    authorizer: { username },
+    authorizer,
     body: { caption, tags },
-    params: { id },
+    params,
   } = req;
 
-  const image = await Image.findById(id);
+  const image = await Image.findById(params.id);
 
   if (!image) {
     res.sendStatus(404);
-  } else if (image.user !== username) {
+  } else if (image.user !== authorizer.id) {
     res.sendStatus(403);
   } else {
     if (caption) {
@@ -114,7 +114,7 @@ exports.update = async (req, res) => {
 
       res.status(200).json({
         ...payload,
-        isLiked: image.isLikedBy(username),
+        isLiked: image.isLikedBy(authorizer.id),
         comments: comments.map(({ id, ...comment }) => comment), // eslint-disable-line no-shadow
       });
     }
@@ -123,15 +123,15 @@ exports.update = async (req, res) => {
 
 exports.delete = async (req, res) => {
   const {
-    authorizer: { username },
-    params: { id },
+    authorizer,
+    params,
   } = req;
 
-  const image = await Image.findById(id);
+  const image = await Image.findById(params.id);
 
   if (!image) {
     res.sendStatus(404);
-  } else if (image.user !== username) {
+  } else if (image.user !== authorizer.id) {
     res.sendStatus(403);
   } else {
     await image.remove();

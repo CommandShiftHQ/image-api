@@ -21,9 +21,11 @@ app.use('/me', authenticate, routes.me);
 
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   console.log(err.stack); // eslint-disable-line no-console
-  res.status(500).json({ message: 'Something went wrong!' });
+  res.sendStatus(500);
 });
 
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true }, () => {
-  app.listen(process.env.PORT || 7890);
+  app.listen(process.env.PORT || 7890, () => {
+    console.log(`http://127.0.0.1:${process.env.PORT || 7890}`);
+  });
 });

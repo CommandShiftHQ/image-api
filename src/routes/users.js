@@ -9,7 +9,7 @@ const router = express.Router();
 router.route('/')
   .post(multer().single('avatar'), checkMimetype, UsersController.create);
 
-router.route('/:username')
+router.route('/:id')
   .get(getAuthorizer, UsersController.find);
 
 module.exports = router;

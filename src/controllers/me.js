@@ -3,37 +3,36 @@ const Image = require('../models/image');
 const ImageUtils = require('../lib/images');
 
 exports.profile = async (req, res) => {
-  const { authorizer: { username } } = req;
-  const user = await User.findOne({ username })
+  const { authorizer } = req;
+  const user = await User.findById(authorizer.id)
     .populate('images')
-    .select('-password')
+    .select('-password -access_token')
     .exec();
 
   if (!user) {
     res.sendStatus(404);
   } else {
-    const { id, __v, ...payload } = user.toObject({ virtuals: true });
-    res.status(200).json(payload);
+    {
+      const { id, __v, ...payload } = user.toObject({
+        virtuals: true,
+      });
+      res.status(200).json(payload);
+    }
   }
 };
 
 exports.update = async (req, res) => {
   const {
-    authorizer: { username },
+    authorizer,
     body,
     file,
   } = req;
 
-  let avatar;
-
-  const user = await User.findOne({ username });
+  const user = await User.findById(authorizer.id);
 
   if (!user) {
     res.sendStatus(404);
   } else {
-    if (file) {
-      avatar = await ImageUtils.upload(file, username, 'avatar');
-    }
 
     if (body.firstName) {
       user.set('firstName', body.firstName);
@@ -44,14 +43,15 @@ exports.update = async (req, res) => {
     if (body.password) {
       user.set('password', body.password);
     }
-    if (avatar) {
+    if (file) {
+      const avatar = await ImageUtils.upload(file, authorizer.id, 'avatar');
       user.set('avatar', avatar);
     }
 
     const updatedUser = await user.save();
 
     const {
-      id, __v, password, ...payload
+      id, __v, password, access_token, ...payload // eslint-disable-line camelcase
     } = updatedUser;
 
     res.status(200).json(payload);
@@ -59,8 +59,8 @@ exports.update = async (req, res) => {
 };
 
 exports.delete = async (req, res) => {
-  const { authorizer: { username } } = req;
-  await Image.deleteMany({ user: username });
-  await User.deleteOne({ username });
+  const { authorizer: { id } } = req;
+  await Image.deleteMany({ user: id });
+  await User.findByIdAndDelete(id);
   res.sendStatus(204);
 };
