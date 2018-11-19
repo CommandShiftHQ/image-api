@@ -12,9 +12,11 @@
         <h2>Endpoints</h2>
 
         <section id="auth">
+          <h3>Authentication</h3>
           <p>Users can authenticate themselves using either an email/password or with </p>
           <section id="post-auth-login">
             <h3><code>POST /auth/login</code></h3>
+            <p>Logs a user in with an email and password</p>
             <h4>Request Params:</h4>
             <ul>
               <li><code>email</code> - users email address</li>
@@ -27,6 +29,7 @@
           </section>
           <section id="post-auth-google">
             <h3><code>POST /auth/google</code></h3>
+            <p>Logs a user in, or creates a new users account if one doesn't exist with the selected email address</p>
             <p>To authenticate with Google, you should redirect the user to the following URL:</p>
             <p><code>https://accounts.google.com/o/oauth2/v2/auth</code></p>
             <p>with the following query params:
@@ -63,6 +66,72 @@
             <h4>Response:</h4>
             <ul>
               <li><code>token</code> - JWT containing the users details</li>
+            </ul>
+          </section>
+        </section>
+
+        <section id="users">
+          <h3>Users</h3>
+          <section id="post-users">
+            <h3><code>POST /users</code></h3>
+            <p>Creates a new user</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Content-Type</code> - either <code>application/json</code> (if no image is present) or <code>multipart/form-data</code> (if image is present)
+              </li>
+            </ul>
+            <h4>Request Params:</h4>
+            <ul>
+              <li><code>firstName</code> - string -  users first name - required</li>
+              <li><code>lastName</code> - string - users email address - required</li>
+              <li><code>email</code> - string - users email address - required</li>
+              <li><code>password</code> - string - users password - required</li>
+              <li><code>avatar</code> - file - profile image - optional</li>
+            </ul>
+            <h4>Response:</h4>
+            <ul>
+              <li>
+                <code>firstName</code> - string - users first name
+              </li>
+              <li>
+                <code>lastName</code> - string - users last name
+              </li>
+              <li>
+                <code>avatar</code> - string - URL of users avatar
+              </li>
+              <li>
+                <code>images</code> - array - array of images - see image endpoints for more details.
+              </li>
+            </ul>
+          </section>
+          <section id="get-users-id">
+            <h3><code>GET /users/:id</code></h3>
+            <p>Returns the profile of a user with the given ID</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code>  a valid JWT (optional). If provided, the returned image data will contain details of whether the authenticated user has liked the image.
+              </li>
+            </ul>
+            <h4>Route Params:</h4>
+            <ul>
+              <li><code>id</code> - A valid user ID</li>
+            </ul>
+            <h4>Response:</h4>
+            <ul>
+              <li>
+                <code>firstName</code> - string - users first name
+              </li>
+              <li>
+                <code>lastName</code> - string - users last name
+              </li>
+              <li>
+                <code>avatar</code> - string - URL of users avatar
+              </li>
+              <li>
+                <code>images</code> - array - array of images - see image endpoints for more details.
+              </li>
             </ul>
           </section>
         </section>
