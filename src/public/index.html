@@ -108,6 +108,7 @@
               </li>
             </ul>
           </section>
+
           <section id="get-users-id">
             <h3><code>GET /users/:id</code></h3>
             <p>Returns the profile of a user with the given ID</p>
@@ -170,6 +171,61 @@
                 <code>images</code> - array - array of images belonging to the user - see image endpoints for more details.
               </li>
             </ul>
+          </section>
+
+          <section id="patch-me">
+            <h3><code>PATCH /me</code></h3>
+            <p>Updates fields on the authenticated users profile</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code> - required - a valid JWT.
+              </li>
+            </ul>
+            <h4>Request Params:</h4>
+            <ul>
+              <li>
+                <li><code>firstName</code> - string - users first name - optional</li>
+                <li><code>lastName</code> - string - users email address - optional</li>
+                <li><code>password</code> - string - users password - optional</li>
+                <li><code>avatar</code> - file - profile image. Valid mimetypes include 'image/jpeg', 'image/png' and 'image/gif' -
+                  optional</li>
+              </li>
+            </ul>
+            <h4>Response:</h4>
+            <ul>
+              <li>
+                <code>_id</code> - string - users unique id
+              </li>
+              <li>
+                <code>firstName</code> - string - users first name
+              </li>
+              <li>
+                <code>lastName</code> - string - users last name
+              </li>
+              <li>
+                <code>email</code> - string - users email address
+              </li>
+              <li>
+                <code>avatar</code> - string - URL of users avatar
+              </li>
+              <li>
+                <code>images</code> - array - array of images belonging to the user - see image endpoints for more details.
+              </li>
+            </ul>
+          </section>
+
+          <section id="delete-me">
+            <h3><code>PATCH /me</code></h3>
+            <p>Deletes the authenticated users profile</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code> - required - a valid JWT.
+              </li>
+            </ul>
+            <h4>Response:</h4>
+            <h5>Status: 204 - No Content</h5>
           </section>
         </section>
       </section>
