@@ -87,7 +87,7 @@
               <li><code>lastName</code> - string - users email address - required</li>
               <li><code>email</code> - string - users email address - required</li>
               <li><code>password</code> - string - users password - required</li>
-              <li><code>avatar</code> - file - profile image - optional</li>
+              <li><code>avatar</code> - file - profile image. Valid mimetypes include 'image/jpeg', 'image/png' and 'image/gif' - optional</li>
             </ul>
             <h4>Response:</h4>
             <ul>
@@ -111,7 +111,7 @@
             <h4>Request Headers:</h4>
             <ul>
               <li>
-                <code>Authorization</code>  a valid JWT (optional). If provided, the returned image data will contain details of whether the authenticated user has liked the image.
+                <code>Authorization</code> - a valid JWT (optional). If provided, the returned image data will contain details of whether the authenticated user has liked the image.
               </li>
             </ul>
             <h4>Route Params:</h4>
