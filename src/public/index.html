@@ -27,10 +27,38 @@
           </section>
           <section id="post-auth-google">
             <h3><code>POST /auth/google</code></h3>
+            <p>To authenticate with Google, you should redirect the user to the following URL:</p>
+            <p><code>https://accounts.google.com/o/oauth2/v2/auth</code></p>
+            <p>with the following query params:
+              <ul>
+                <li>
+                  <code>
+                    scope: https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email
+                  </code>
+                </li>
+                <li>
+                  <code>
+                    redirect_uri: http://localhost:8080/google-auth
+                  </code>
+                </li>
+                <li>
+                  <code>
+                    client_id: Ask a tutor for this credential.
+                  </code>
+                </li>
+              </ul>
+            </p>
+
+            <p>
+              This will redirect back to your client application with either a <code>code</code> or <code>error</code> query parameter.
+            </p>
+            <p>
+              If a code is returned, this should be forwarded to the <code>/auth/google</code> API endpoint.
+              If an error is returned, this should be handled in the client.
+            </p>
             <h4>Request Params:</h4>
             <ul>
-              <li><code>email</code> - users email address</li>
-              <li><code>password</code> - users password</li>
+              <li><code>code</code> - temporary auth token provided by Google</li>
             </ul>
             <h4>Response:</h4>
             <ul>
