@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
+const path = require('path');
 const routes = require('./routes');
 const { authenticate } = require('./middleware/authenticate');
 
@@ -13,6 +14,7 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.resolve(__dirname, './public')));
 
 app.use('/auth', routes.auth);
 app.use('/users', routes.users);
