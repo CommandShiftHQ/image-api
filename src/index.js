@@ -28,6 +28,6 @@ app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
 
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true }, () => {
   app.listen(process.env.PORT || 7890, () => {
-    console.log(`http://127.0.0.1:${process.env.PORT || 7890}`);
+    console.log(`http://127.0.0.1:${process.env.PORT || 7890}`); // eslint-disable-line no-console
   });
 });

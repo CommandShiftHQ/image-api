@@ -92,6 +92,9 @@
             <h4>Response:</h4>
             <ul>
               <li>
+                <code>_id</code> - string - users unique id
+              </li>
+              <li>
                 <code>firstName</code> - string - users first name
               </li>
               <li>
@@ -121,6 +124,9 @@
             <h4>Response:</h4>
             <ul>
               <li>
+                <code>_id</code> - string - users unique id
+              </li>
+              <li>
                 <code>firstName</code> - string - users first name
               </li>
               <li>
@@ -130,7 +136,38 @@
                 <code>avatar</code> - string - URL of users avatar
               </li>
               <li>
-                <code>images</code> - array - array of images - see image endpoints for more details.
+                <code>images</code> - array - array of images belonging to the user - see image endpoints for more details.
+              </li>
+            </ul>
+          </section>
+          <section id="get-me">
+            <h3><code>GET /me</code></h3>
+            <p>Returns the profile of the authenticated user</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code> - required - a valid JWT.
+              </li>
+            </ul>
+            <h4>Response:</h4>
+            <ul>
+              <li>
+                <code>_id</code> - string - users unique id
+              </li>
+              <li>
+                <code>firstName</code> - string - users first name
+              </li>
+              <li>
+                <code>lastName</code> - string - users last name
+              </li>
+              <li>
+                <code>email</code> - string - users email address
+              </li>
+              <li>
+                <code>avatar</code> - string - URL of users avatar
+              </li>
+              <li>
+                <code>images</code> - array - array of images belonging to the user - see image endpoints for more details.
               </li>
             </ul>
           </section>

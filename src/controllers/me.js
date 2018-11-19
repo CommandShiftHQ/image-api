@@ -33,7 +33,6 @@ exports.update = async (req, res) => {
   if (!user) {
     res.sendStatus(404);
   } else {
-
     if (body.firstName) {
       user.set('firstName', body.firstName);
     }
