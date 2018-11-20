@@ -4,10 +4,14 @@ const imageSchema = new mongoose.Schema({
   user: { type: String, index: { sparse: true } },
   src: String,
   thumb: String,
-  caption: String,
+  caption: {
+    type: String,
+    required: [true, 'Caption is required'],
+  },
   tags: {
     type: [String],
     index: { sparse: true },
+    default: [],
   },
   likedBy: {
     type: [String],

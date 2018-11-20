@@ -239,6 +239,41 @@
 
         <section id="images">
           <h3>Images</h3>
+          An image object returned from the API will have the following structure:
+          <ul>
+            <li>
+              <code>_id</code> - string - unique id of image
+            </li>
+            <li>
+              <code>user</code> - string - unique id of the user who uploaded the image
+            </li>
+            <li>
+              <code>src</code> - string - url to the full image
+            </li>
+            <li>
+              <code>thumb</code> - string - url to the image thumbnail (300 x 300)
+            </li>
+            <li>
+              <code>caption</code> - string - image caption
+            </li>
+            <li>
+              <code>tags</code> - array[string] - array of searchable tags
+            </li>
+            <li>
+              <code>comments</code> - array[Comment] - array of comments (see below)
+            </li>
+            <li>
+              <code>timestamp</code> - int - upload time of image in unix milliseconds
+            </li>
+            <li>
+              <code>likes</code> - int - number of times the image has been liked
+            </li>
+            <li>
+              <code>isLiked</code> - bool - true if the authenticated user has liked the image. False if te user has not liked
+              the image, or if there is no authenticated user.
+            </li>
+          </ul>
+
           <section id="get-images">
             <h3><code>GET /images</code></h3>
             <p>Returns a list of images</p>
@@ -255,39 +290,7 @@
               </li>
             </ul>
             <h4>Response:</h4>
-            An array of objects with the following shape:
-            <ul>
-              <li>
-                <code>_id</code> - string - unique id of image
-              </li>
-              <li>
-                <code>user</code> - string - unique id of the user who uploaded the image
-              </li>
-              <li>
-                <code>src</code> - string - url to the full image
-              </li>
-              <li>
-                <code>thumb</code> - string - url to the image thumbnail (300 x 300)
-              </li>
-              <li>
-                <code>caption</code> - string - image caption
-              </li>
-              <li>
-                <code>tags</code> - array[string] - array of searchable tags
-              </li>
-              <li>
-                <code>comments</code> - array[Comment] - array of comments (see below)
-              </li>
-              <li>
-                <code>timestamp</code> - int - upload time of image in unix milliseconds
-              </li>
-              <li>
-                <code>likes</code> - int - number of times the image has been liked
-              </li>
-              <li>
-                <code>isLiked</code> - bool - true if the authenticated user has liked the image. False if te user has not liked the image, or if there is no authenticated user.
-              </li>
-            </ul>
+            An array of <code>Image</code> objects as defined above
           </section>
           <section id="post-images">
             <h3><code>POST /images</code></h3>
@@ -301,6 +304,21 @@
                 <code>Content-Type</code> - must be <code>multipart/form-data</code>
               </li>
             </ul>
+            <h4>Request Params:</h4>
+            <ul>
+              <li>
+                <code>caption</code> - string - image caption - required
+              </li>
+              <li>
+                <code>tags</code> - array[string] - array of searchable tags - optional - defaults to an empty array
+              </li>
+              <li>
+                <code>image</code> - file - Valid mimetypes include 'image/jpeg', 'image/png' and 'image/gif' - required
+              </li>
+            </ul>
+            <h4>Response:</h4>
+            A new <code>Image</code> object (as defined above) representing the uploaded image
+            </section>
           </section>
           <section id="get-image">
             <h3><code>get /images/:id</code></h3>
@@ -311,6 +329,9 @@
                 <code>Authorization</code> - optional - a valid JWT.
               </li>
             </ul>
+            <h4>Response:</h4>
+            The requested <code>Image</code> object (as defined above).
+            </section>
           </section>
           <section id="patch-image">
             <h3><code>PATCH /images/:id</code></h3>
@@ -321,6 +342,18 @@
                 <code>Authorization</code> - required - a valid JWT.
               </li>
             </ul>
+            <h4>Request Params:</h4>
+            <ul>
+              <li>
+                <code>caption</code> - string - image caption - optional
+              </li>
+              <li>
+                <code>tags</code> - array[string] - array of searchable tags - optional - defaults to an empty array
+              </li>
+            </ul>
+            <h4>Response:</h4>
+            An <code>Image</code> object (as defined above) representing the updated image
+            </section>
           </section>
           <section id="delete-image">
             <h3><code>DELETE /images/:id</code></h3>
@@ -331,6 +364,8 @@
                 <code>Authorization</code> - required - a valid JWT.
               </li>
             </ul>
+            <h4>Response:</h4>
+            <h5>Status: 204 - No Content</h5>
           </section>
         </section>
 
