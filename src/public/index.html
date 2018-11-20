@@ -239,7 +239,7 @@
 
         <section id="images">
           <h3>Images</h3>
-          An image object returned from the API will have the following structure:
+          An <code>Image</code> object returned from the API will have the following structure:
           <ul>
             <li>
               <code>_id</code> - string - unique id of image
@@ -269,7 +269,7 @@
               <code>likes</code> - int - number of times the image has been liked
             </li>
             <li>
-              <code>isLiked</code> - bool - true if the authenticated user has liked the image. False if te user has not liked
+              <code>isLiked</code> - bool - <code>true</code> if the authenticated user has liked the image. <code>false</code> if the user has not liked
               the image, or if there is no authenticated user.
             </li>
           </ul>
@@ -372,6 +372,21 @@
         <hr />
 
         <section id="comments">
+          <code>Comment</code> objects returned from the API (including those embedded in <code>Image</code> objects) will have the following structure:
+          <ul>
+            <li>
+              <code>_id</code> - string - unique id of the comment
+            </li>
+            <li>
+              <code>author</code> - string - unique id of the user who added the comment
+            </li>
+            <li>
+              <code>content</code> - string - the comment text
+            </li>
+            <li>
+              <code>timestamp</code> - int - added time of comment in unix milliseconds
+            </li>
+          </ul>
           <h3>Comments</h3>
           <section id="post-image-comments">
             <h3><code>POST /images/:id/comments</code></h3>
@@ -382,6 +397,14 @@
                 <code>Authorization</code> - required - a valid JWT.
               </li>
             </ul>
+            <h4>Request Params:</h4>
+            <ul>
+              <li>
+                <code>content</code> - string - comment text - required
+              </li>
+            </ul>
+            <h4>Response:</h4>
+            A <code>Comment</code> object (as defined above) representing the new comment
           </section>
           <section id="delete-image-comment">
             <h3><code>DELETE /images/:imageId/comments/:commentId</code></h3>
@@ -392,6 +415,8 @@
                 <code>Authorization</code> - required - a valid JWT.
               </li>
             </ul>
+            <h4>Response:</h4>
+            <h5>Status: 204 - No Content</h5>
           </section>
         </section>
 
@@ -408,6 +433,9 @@
                 <code>Authorization</code> - required - a valid JWT.
               </li>
             </ul>
+            <h4>Response:</h4>
+            An <code>Image</code> object (as defined above) representing the updated image
+            </section>
           </section>
         </section>
       </section>
