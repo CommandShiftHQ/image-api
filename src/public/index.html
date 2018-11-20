@@ -104,12 +104,12 @@
                 <code>avatar</code> - string - URL of users avatar
               </li>
               <li>
-                <code>images</code> - array - array of images - see image endpoints for more details.
+                <code>images</code> - array[Image] - array of images - see image endpoints for more details.
               </li>
             </ul>
           </section>
 
-          <section id="get-users-id">
+          <section id="get-user">
             <h3><code>GET /users/:id</code></h3>
             <p>Returns the profile of a user with the given ID</p>
             <h4>Request Headers:</h4>
@@ -137,10 +137,11 @@
                 <code>avatar</code> - string - URL of users avatar
               </li>
               <li>
-                <code>images</code> - array - array of images belonging to the user - see image endpoints for more details.
+                <code>images</code> - array[Images] - array of images belonging to the user - see image endpoints for more details.
               </li>
             </ul>
           </section>
+
           <section id="get-me">
             <h3><code>GET /me</code></h3>
             <p>Returns the profile of the authenticated user</p>
@@ -168,7 +169,7 @@
                 <code>avatar</code> - string - URL of users avatar
               </li>
               <li>
-                <code>images</code> - array - array of images belonging to the user - see image endpoints for more details.
+                <code>images</code> - array[Images] - array of images belonging to the user - see image endpoints for more details.
               </li>
             </ul>
           </section>
@@ -180,6 +181,10 @@
             <ul>
               <li>
                 <code>Authorization</code> - required - a valid JWT.
+              </li>
+              <li>
+                <code>Content-Type</code> - either <code>application/json</code> (if no image is present) or <code>multipart/form-data</code>
+                (if image is present)
               </li>
             </ul>
             <h4>Request Params:</h4>
@@ -208,7 +213,7 @@
                 <code>avatar</code> - string - URL of users avatar
               </li>
               <li>
-                <code>images</code> - array - array of images belonging to the user - see image endpoints for more details.
+                <code>images</code> - array[Image] - array of images belonging to the user - see image endpoints for more details.
               </li>
             </ul>
           </section>
@@ -224,6 +229,141 @@
             </ul>
             <h4>Response:</h4>
             <h5>Status: 204 - No Content</h5>
+          </section>
+
+        </section>
+        <section id="images">
+          <h3>Images</h3>
+          <section id="get-images">
+            <h3><code>GET /images</code></h3>
+            <p>Returns a list of images</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code> - optional - a valid JWT.
+              </li>
+            </ul>
+            <h4>Query Parameters:</h4>
+            <ul>
+              <li>
+                <code>tags</code> - array[string] - array of tags to filter response by. Only images with matching tags will be returned
+              </li>
+            </ul>
+            <h4>Response:</h4>
+            An array of objects with the following shape:
+            <ul>
+              <li>
+                <code>_id</code> - string - unique id of image
+              </li>
+              <li>
+                <code>user</code> - string - unique id of the user who uploaded the image
+              </li>
+              <li>
+                <code>src</code> - string - url to the full image
+              </li>
+              <li>
+                <code>thumb</code> - string - url to the image thumbnail (300 x 300)
+              </li>
+              <li>
+                <code>caption</code> - string - image caption
+              </li>
+              <li>
+                <code>tags</code> - array[string] - array of searchable tags
+              </li>
+              <li>
+                <code>comments</code> - array[Comment] - array of comments (see below)
+              </li>
+              <li>
+                <code>timestamp</code> - int - upload time of image in unix milliseconds
+              </li>
+              <li>
+                <code>likes</code> - int - number of times the image has been liked
+              </li>
+              <li>
+                <code>isLiked</code> - bool - true if the authenticated user has liked the image. False if te user has not liked the image, or if there is no authenticated user.
+              </li>
+            </ul>
+          </section>
+          <section id="post-images">
+            <h3><code>POST /images</code></h3>
+            <p>Creates a new image</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code> - required - a valid JWT.
+              </li>
+              <li>
+                <code>Content-Type</code> - must be <code>multipart/form-data</code>
+              </li>
+            </ul>
+          </section>
+          <section id="get-image">
+            <h3><code>get /images/:id</code></h3>
+            <p>Returns a single image with the given id</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code> - optional - a valid JWT.
+              </li>
+            </ul>
+          </section>
+          <section id="patch-image">
+            <h3><code>PATCH /images/:id</code></h3>
+            <p>Updates the image with the given id</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code> - required - a valid JWT.
+              </li>
+            </ul>
+          </section>
+          <section id="delete-image">
+            <h3><code>DELETE /images/:id</code></h3>
+            <p>Deletes the image with the given id</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code> - required - a valid JWT.
+              </li>
+            </ul>
+          </section>
+        </section>
+
+        <section id="comments">
+          <h3>Comments</h3>
+          <section id="post-image-comments">
+            <h3><code>POST /images/:id/comments</code></h3>
+            <p>Adds a comment to an image</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code> - required - a valid JWT.
+              </li>
+            </ul>
+          </section>
+          <section id="delete-image-comment">
+            <h3><code>DELETE /images/:imageId/comments/:commentId</code></h3>
+            <p>Deletes a comment from an image</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code> - required - a valid JWT.
+              </li>
+            </ul>
+          </section>
+        </section>
+
+        <section id="likes">
+          <h3>Likes</h3>
+          <section id="patch-image-likes">
+            <h3><code>PATCH /images/:id/likes</code></h3>
+            <p>Likes or unlikes an image</p>
+            <h4>Request Headers:</h4>
+            <ul>
+              <li>
+                <code>Authorization</code> - required - a valid JWT.
+              </li>
+            </ul>
           </section>
         </section>
       </section>
