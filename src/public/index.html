@@ -17,7 +17,7 @@
           <section id="post-auth-login">
             <h3><code>POST /auth/login</code></h3>
             <p>Logs a user in with an email and password</p>
-            <h4>Request Params:</h4>
+            <h4>Request Body Params:</h4>
             <ul>
               <li><code>email</code> - users email address</li>
               <li><code>password</code> - users password</li>
@@ -59,7 +59,7 @@
               If a code is returned, this should be forwarded to the <code>/auth/google</code> API endpoint.
               If an error is returned, this should be handled in the client.
             </p>
-            <h4>Request Params:</h4>
+            <h4>Request Body Params:</h4>
             <ul>
               <li><code>code</code> - temporary auth token provided by Google</li>
             </ul>
@@ -83,7 +83,7 @@
                 <code>Content-Type</code> - either <code>application/json</code> (if no image is present) or <code>multipart/form-data</code> (if image is present)
               </li>
             </ul>
-            <h4>Request Params:</h4>
+            <h4>Request Body Params:</h4>
             <ul>
               <li><code>firstName</code> - string -  users first name - required</li>
               <li><code>lastName</code> - string - users email address - required</li>
@@ -189,7 +189,7 @@
                 (if image is present)
               </li>
             </ul>
-            <h4>Request Params:</h4>
+            <h4>Request Body Params:</h4>
             <ul>
                 <li><code>firstName</code> - string - users first name - optional</li>
                 <li><code>lastName</code> - string - users email address - optional</li>
@@ -304,7 +304,7 @@
                 <code>Content-Type</code> - must be <code>multipart/form-data</code>
               </li>
             </ul>
-            <h4>Request Params:</h4>
+            <h4>Request Body Params:</h4>
             <ul>
               <li>
                 <code>caption</code> - string - image caption - required
@@ -342,7 +342,7 @@
                 <code>Authorization</code> - required - a valid JWT.
               </li>
             </ul>
-            <h4>Request Params:</h4>
+            <h4>Request Body Params:</h4>
             <ul>
               <li>
                 <code>caption</code> - string - image caption - optional
@@ -397,7 +397,7 @@
                 <code>Authorization</code> - required - a valid JWT.
               </li>
             </ul>
-            <h4>Request Params:</h4>
+            <h4>Request Body Params:</h4>
             <ul>
               <li>
                 <code>content</code> - string - comment text - required
