@@ -39,7 +39,9 @@ exports.upload = (file, owner, type = 'main') => new Promise((resolve, reject) =
   const stream = gm(file.buffer, file.originalname)
     .resize(...dimensions[type]);
 
-  toBuffer(stream)
+  console.log(1, stream);
+
+  toBuffer(2, stream)
     .then((data) => {
       console.log(data);
       s3.putObject({
