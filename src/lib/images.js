@@ -1,5 +1,5 @@
 const AWS = require('aws-sdk');
-const gm = require('gm').subClass({ imageMagick: true });
+const gm = require('gm');
 const moment = require('moment');
 const uuid = require('uuid/v4');
 
