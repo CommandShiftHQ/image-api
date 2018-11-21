@@ -61,9 +61,14 @@ exports.create = async (req, res) => {
     body: { caption, tags },
   } = req;
 
+  console.log(1, 'here i am');
+
+
   if (!file) {
     return res.status(400).json({ message: 'Image file is required' });
   }
+
+  console.log(1, 'we have a file');
 
   const [src, thumb] = await Promise.all([
     ImageUtils.upload(file, authorizer.id, 'main'),

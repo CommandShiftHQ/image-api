@@ -23,6 +23,8 @@ const dimensions = {
 
 const toBuffer = data => new Promise((resolve, reject) => {
   data.stream((err, stdout, stderr) => {
+    console.log('TOBUFFER', err);
+
     if (err) {
       reject(err);
     } else {
@@ -35,11 +37,14 @@ const toBuffer = data => new Promise((resolve, reject) => {
 });
 
 exports.upload = (file, owner, type = 'main') => new Promise((resolve, reject) => {
+  console.log('in upload');
+
   const key = getKey(owner, paths[type], extension(file.originalname));
+  console.log('key', key);
   const stream = gm(file.buffer, file.originalname)
     .resize(...dimensions[type]);
 
-  console.log(1, stream);
+  console.log('stream', stream);
 
   toBuffer(2, stream)
     .then((data) => {
