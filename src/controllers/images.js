@@ -61,8 +61,6 @@ exports.create = async (req, res) => {
     body: { caption, tags },
   } = req;
 
-  console.log(file);
-
   const [src, thumb] = await Promise.all([
     ImageUtils.upload(file, authorizer.id, 'main'),
     ImageUtils.upload(file, authorizer.id, 'thumbnail'),

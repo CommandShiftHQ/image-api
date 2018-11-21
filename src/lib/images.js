@@ -21,25 +21,37 @@ const dimensions = {
   avatar: [640],
 };
 
+const toBuffer = data => new Promise((resolve, reject) => {
+  data.stream((err, stdout, stderr) => {
+    if (err) {
+      reject(err);
+    } else {
+      const chunks = [];
+      stdout.on('data', chunk => chunks.push(chunk));
+      stdout.once('end', () => resolve(Buffer.concat(chunks)));
+      stderr.once('data', data => reject(String(data)));
+    }
+  });
+});
+
 exports.upload = (file, owner, type = 'main') => new Promise((resolve, reject) => {
   const key = getKey(owner, paths[type], extension(file.originalname));
-  gm(file.buffer, file.originalname)
-    .resize(...dimensions[type])
-    .toBuffer((err, data) => {
-      if (err) {
-        reject(err);
-      } else {
-        s3.putObject({
-          Bucket: process.env.S3_BUCKET_NAME,
-          Key: key,
-          Body: data,
-        }, (error) => {
-          if (error) {
-            reject(error);
-          } else {
-            resolve(link(key));
-          }
-        });
-      }
-    });
+  const stream = gm(file.buffer, file.originalname)
+    .resize(...dimensions[type]);
+
+  toBuffer(stream)
+    .then((data) => {
+      s3.putObject({
+        Bucket: process.env.S3_BUCKET_NAME,
+        Key: key,
+        Body: data,
+      }, (error) => {
+        if (error) {
+          reject(error);
+        } else {
+          resolve(link(key));
+        }
+      });
+    })
+    .catch(err => reject(err));
 });
