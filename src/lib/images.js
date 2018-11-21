@@ -41,6 +41,7 @@ exports.upload = (file, owner, type = 'main') => new Promise((resolve, reject) =
 
   toBuffer(stream)
     .then((data) => {
+      console.log(data);
       s3.putObject({
         Bucket: process.env.S3_BUCKET_NAME,
         Key: key,
