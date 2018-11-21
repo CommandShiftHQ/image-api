@@ -21,37 +21,33 @@ const dimensions = {
   avatar: [640],
 };
 
-const toBuffer = data => new Promise((resolve, reject) => {
-  data.stream((err, stdout, stderr) => {
-    if (err) {
-      reject(err);
-    } else {
-      const chunks = [];
-      stdout.on('data', chunk => chunks.push(chunk));
-      stdout.once('end', () => resolve(Buffer.concat(chunks)));
-      stderr.once('data', d => reject(String(d)));
-    }
-  });
-});
-
 exports.upload = (file, owner, type = 'main') => new Promise((resolve, reject) => {
   const key = getKey(owner, paths[type], extension(file.originalname));
-  const stream = gm(file.buffer, file.originalname)
-    .resize(...dimensions[type]);
 
-  toBuffer(2, stream)
-    .then((data) => {
-      s3.putObject({
-        Bucket: process.env.S3_BUCKET_NAME,
-        Key: key,
-        Body: data,
-      }, (error) => {
-        if (error) {
-          reject(error);
-        } else {
-          resolve(link(key));
-        }
-      });
+  gm(file.buffer, file.originalname)
+    .resize(...dimensions[type])
+    .stream((err, stdout, stderr) => new Promise((res, rej) => {
+      if (err) {
+        rej(err);
+      } else {
+        const chunks = [];
+        stdout.on('data', chunk => chunks.push(chunk));
+        stdout.once('end', () => res(Buffer.concat(chunks)));
+        stderr.once('data', d => rej(String(d)));
+      }
     })
-    .catch(err => reject(err));
+      .then((data) => {
+        s3.putObject({
+          Bucket: process.env.S3_BUCKET_NAME,
+          Key: key,
+          Body: data,
+        }, (error) => {
+          if (error) {
+            reject(error);
+          } else {
+            resolve(link(key));
+          }
+        });
+      })
+      .catch(e => reject(e)));
 });
