@@ -4,7 +4,7 @@ const ImageUtils = require('../lib/images');
 exports.create = async (req, res) => {
   const { file, body } = req;
 
-  const existing = await User.find({ email: body.email });
+  const existing = await User.findOne({ email: body.email });
 
   if (existing) {
     res.status(400).json({ message: 'Email address is taken' });
