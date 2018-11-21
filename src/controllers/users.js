@@ -4,24 +4,30 @@ const ImageUtils = require('../lib/images');
 exports.create = async (req, res) => {
   const { file, body } = req;
 
-  const user = await new User({
-    email: body.email,
-    firstName: body.firstName,
-    lastName: body.lastName,
-    password: body.password,
-  }).save();
+  const existing = await User.find({ email: body.email });
 
-  if (file) {
-    const avatar = await ImageUtils.upload(file, user.id, 'avatar');
-    user.set('avatar', avatar);
-    await user.save();
+  if (existing) {
+    res.status(400).json({ message: 'Email address is taken' });
+  } else {
+    const user = await new User({
+      email: body.email,
+      firstName: body.firstName,
+      lastName: body.lastName,
+      password: body.password,
+    }).save();
+
+    if (file) {
+      const avatar = await ImageUtils.upload(file, user.id, 'avatar');
+      user.set('avatar', avatar);
+      await user.save();
+    }
+
+    const {
+      email, password, access_token, ...payload // eslint-disable-line camelcase
+    } = user.toObject();
+
+    res.status(201).json(payload);
   }
-
-  const {
-    email, password, access_token, ...payload // eslint-disable-line camelcase
-  } = user.toObject();
-
-  res.status(201).json(payload);
 };
 
 exports.find = async (req, res) => {
