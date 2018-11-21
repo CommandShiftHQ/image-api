@@ -61,6 +61,10 @@ exports.create = async (req, res) => {
     body: { caption, tags },
   } = req;
 
+  if (!file) {
+    return res.status(400).json({ message: 'Image file is required' });
+  }
+
   const [src, thumb] = await Promise.all([
     ImageUtils.upload(file, authorizer.id, 'main'),
     ImageUtils.upload(file, authorizer.id, 'thumbnail'),
@@ -81,7 +85,7 @@ exports.create = async (req, res) => {
 
   payload.isLiked = image.isLikedBy(authorizer.id);
 
-  res.status(201).json(payload);
+  return res.status(201).json(payload);
 };
 
 exports.update = async (req, res) => {

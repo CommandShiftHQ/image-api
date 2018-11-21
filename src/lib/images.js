@@ -29,7 +29,7 @@ const toBuffer = data => new Promise((resolve, reject) => {
       const chunks = [];
       stdout.on('data', chunk => chunks.push(chunk));
       stdout.once('end', () => resolve(Buffer.concat(chunks)));
-      stderr.once('data', data => reject(String(data)));
+      stderr.once('data', d => reject(String(d)));
     }
   });
 });
