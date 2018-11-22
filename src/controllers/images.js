@@ -66,19 +66,40 @@ exports.create = async (req, res) => {
     return res.status(400).json({ message: 'Image file is required' });
   }
 
-  const [src, thumb] = await Promise.all([
-    ImageUtils.upload(file, authorizer.id, 'main'),
-    ImageUtils.upload(file, authorizer.id, 'thumbnail'),
-  ]);
+  if (!caption) {
+    return res.status(400).json({ message: 'Caption is required' });
+  }
 
-  const image = await new Image({
-    src,
-    thumb,
-    caption,
-    tags,
-    user: authorizer.id,
-    timestamp: moment.utc().valueOf(),
-  }).save();
+  let src, thumb;
+
+  try {
+    [src, thumb] = await Promise.all([
+      ImageUtils.upload(file, authorizer.id, 'main'),
+      ImageUtils.upload(file, authorizer.id, 'thumbnail'),
+    ]);
+  } catch (error) {
+    console.error(error.stack); // eslint-disable-line no-console
+    return res.status(500).json({ message: 'Error uploading image' });
+  }
+
+  let image;
+
+  try {
+    image = await new Image({
+      src,
+      thumb,
+      caption,
+      tags,
+      user: authorizer.id,
+      timestamp: moment.utc().valueOf(),
+    }).save();
+  } catch (error) {
+    console.error(error.stack); // eslint-disable-line no-console
+    if (error.name === 'ValidationError') {
+      return res.status(400).json({ message: error.message });
+    }
+    return res.status(500).json({ message: 'Error uploading image' });
+  }
 
   const {
     id, __v, likedBy, ...payload
