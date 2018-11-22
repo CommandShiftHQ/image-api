@@ -9,24 +9,38 @@ exports.create = async (req, res) => {
   if (existing) {
     res.status(400).json({ message: 'Email address is taken' });
   } else {
-    const user = await new User({
-      email: body.email,
-      firstName: body.firstName,
-      lastName: body.lastName,
-      password: body.password,
-    }).save();
+    let user;
+    try {
+      user = await new User({
+        email: body.email,
+        firstName: body.firstName,
+        lastName: body.lastName,
+        password: body.password,
+      }).save();
+    } catch (error) {
+      console.error(error.stack); // eslint-disable-line no-console
+      if (error.name === 'ValidationError') {
+        return res.status(400).json({ message: error.message });
+      }
+      return res.status(500).json({ message: 'Error creating user' });
+    }
 
     if (file) {
-      const avatar = await ImageUtils.upload(file, user.id, 'avatar');
-      user.set('avatar', avatar);
-      await user.save();
+      let avatar;
+      try {
+        avatar = await ImageUtils.upload(file, user.id, 'avatar');
+        user.set('avatar', avatar);
+        await user.save();
+      } catch (error) {
+        console.error(error.stack); // eslint-disable-line no-console
+      }
     }
 
     const {
       email, password, access_token, ...payload // eslint-disable-line camelcase
     } = user.toObject();
 
-    res.status(201).json(payload);
+    return res.status(201).json(payload);
   }
 };
 

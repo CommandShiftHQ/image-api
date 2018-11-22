@@ -42,12 +42,27 @@ exports.update = async (req, res) => {
     if (body.password) {
       user.set('password', body.password);
     }
+
     if (file) {
-      const avatar = await ImageUtils.upload(file, authorizer.id, 'avatar');
-      user.set('avatar', avatar);
+      let avatar;
+      try {
+        avatar = await ImageUtils.upload(file, authorizer.id, 'avatar');
+        user.set('avatar', avatar);
+      } catch (error) {
+        console.error(error.stack); // eslint-disable-line no-console
+      }
     }
 
-    const updatedUser = await user.save();
+    let updatedUser;
+    try {
+      updatedUser = await user.save();
+    } catch (error) {
+      console.error(error.stack); // eslint-disable-line no-console
+      if (error.name === 'ValidationError') {
+        return res.status(400).json({ message: error.message });
+      }
+      return res.status(500).json({ message: 'Error updating user' });
+    }
 
     const {
       id, __v, password, access_token, ...payload // eslint-disable-line camelcase
