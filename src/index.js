@@ -23,7 +23,11 @@ app.use('/me', authenticate, routes.me);
 
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   console.log(err.stack); // eslint-disable-line no-console
-  res.sendStatus(500);
+  if (['MulterError', 'ValidationError'].includes(err.name)) {
+    res.status(400).json({ message: err.message });
+  } else {
+    res.sendStatus(500);
+  }
 });
 
 mongoose.connect(process.env.DATABASE_URL, { useNewUrlParser: true }, () => {
