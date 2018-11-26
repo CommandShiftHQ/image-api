@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const imageSchema = new mongoose.Schema({
-  user: { type: String, index: { sparse: true } },
+  user: {
+    type: mongoose.SchemaTypes.ObjectId,
+    ref: 'User',
+    index: { sparse: true },
+  },
   src: String,
   thumb: String,
   caption: {
@@ -22,7 +26,10 @@ const imageSchema = new mongoose.Schema({
       required: [true, 'Comment text is required'],
       minlength: [1, 'Comment text is required'],
     },
-    author: String,
+    author: {
+      type: mongoose.SchemaTypes.ObjectId,
+      ref: 'User',
+    },
     timestamp: Number,
   }],
   timestamp: Number,

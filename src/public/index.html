@@ -259,7 +259,14 @@
               <code>_id</code> - string - unique id of image
             </li>
             <li>
-              <code>user</code> - string - unique id of the user who uploaded the image
+              <code>user</code> - object - the user who uploaded the image
+              <ul>
+                <code>_id</code> - string - unique id of user
+                <code>firstName</code> - string - users first name
+                <code>lastName</code> - string - users last name
+                <code>avatar</code> - string - users avatar url
+                <code>bio</code> - string - users bio
+              </ul>
             </li>
             <li>
               <code>src</code> - string - url to the full image
@@ -392,7 +399,14 @@
               <code>_id</code> - string - unique id of the comment
             </li>
             <li>
-              <code>author</code> - string - unique id of the user who added the comment
+              <code>author</code> - object - the user who left the comment
+              <ul>
+                <code>_id</code> - string - unique id of user
+                <code>firstName</code> - string - users first name
+                <code>lastName</code> - string - users last name
+                <code>avatar</code> - string - users avatar url
+                <code>bio</code> - string - users bio
+              </ul>
             </li>
             <li>
               <code>content</code> - string - the comment text

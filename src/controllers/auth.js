@@ -35,16 +35,22 @@ exports.login = async (req, res) => {
 };
 
 exports.google = async (req, res) => {
-  const response = await request.post('https://www.googleapis.com/oauth2/v4/token', {
-    body: {
-      client_id: process.env.GOOGLE_CLIENT_ID,
-      client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      code: req.body.code,
-      grant_type: 'authorization_code',
-      redirect_uri: 'http://localhost:8080/google-auth',
-    },
-    json: true,
-  });
+  let response;
+  try {
+    response = await request.post('https://www.googleapis.com/oauth2/v4/token', {
+      body: {
+        client_id: process.env.GOOGLE_CLIENT_ID,
+        client_secret: process.env.GOOGLE_CLIENT_SECRET,
+        code: req.body.code,
+        grant_type: 'authorization_code',
+        redirect_uri: 'http://localhost:8080/google-auth',
+      },
+      json: true,
+    });
+  } catch (error) {
+    console.error(error);
+    return res.sendStatus(401);
+  }
 
   const { access_token, id_token, expires_in } = response; // eslint-disable-line camelcase
   const {

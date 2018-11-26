@@ -1,5 +1,20 @@
 const moment = require('moment');
 const Image = require('../models/image');
+const User = require('../models/user');
+
+const safeUser = (user) => {
+  const {
+    email,
+    password,
+    access_token, // eslint-disable-line camelcase
+    id,
+    __v,
+    images,
+    ...safe
+  } = user;
+
+  return safe;
+};
 
 exports.create = async (req, res) => {
   const {
@@ -9,6 +24,8 @@ exports.create = async (req, res) => {
   } = req;
 
   const image = await Image.findById(params.id);
+
+  const user = await User.findById(authorizer.id);
 
   if (!image) {
     res.sendStatus(404);
@@ -23,7 +40,10 @@ exports.create = async (req, res) => {
 
     await image.save();
 
-    res.status(201).json(comment.toObject());
+    res.status(201).json({
+      ...comment.toObject(),
+      author: safeUser(user.toObject()),
+    });
   }
 };
 

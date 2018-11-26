@@ -1,6 +1,21 @@
 const moment = require('moment');
 const Image = require('../models/image');
+const User = require('../models/user');
 const ImageUtils = require('../lib/images');
+
+const safeUser = (user) => {
+  const {
+    email,
+    password,
+    access_token, // eslint-disable-line camelcase
+    id,
+    __v,
+    images,
+    ...safe
+  } = user;
+
+  return safe;
+};
 
 exports.index = async (req, res) => {
   const { authorizer, query } = req;
@@ -12,18 +27,22 @@ exports.index = async (req, res) => {
 
   let images;
   if (tags) {
-    images = await Image.findByTags(tags);
+    images = await Image.findByTags(tags).populate('user, comments.author').exec();
   } else {
-    images = await Image.find({});
+    images = await Image.find({}).populate('user comments.author').exec();
   }
 
   const payload = images.map(image => {
     const {
-      id, __v, likedBy, comments, ...img
+      id, __v, likedBy, comments, user, ...img
     } = image.toObject({ virtuals: true });
     return {
       ...img,
-      comments: comments.map(({ id, ...comment }) => comment), // eslint-disable-line no-shadow
+      user: safeUser(user),
+      comments: comments.map(({ id, author, ...comment }) => ({ // eslint-disable-line no-shadow
+        ...comment,
+        author: safeUser(author),
+      })),
       isLiked: authorizer.id ? image.isLikedBy(authorizer.id) : false,
     };
   });
@@ -37,18 +56,22 @@ exports.find = async (req, res) => {
     params,
   } = req;
 
-  const image = await Image.findById(params.id);
+  const image = await Image.findById(params.id).populate('user comments.author').exec();
 
   if (!image) {
     res.sendStatus(404);
   } else {
     const {
-      id, __v, likedBy, comments, ...payload // eslint-disable-line no-shadow
+      id, __v, likedBy, comments, user, ...payload // eslint-disable-line no-shadow
     } = image.toObject({ virtuals: true });
 
     res.status(200).json({
       ...payload,
-      comments: comments.map(({ id, ...comment }) => comment), // eslint-disable-line no-shadow
+      user: safeUser(user),
+      comments: comments.map(({ id, author, ...comment }) => ({ // eslint-disable-line no-shadow
+        ...comment,
+        author: safeUser(author),
+      })),
       isLiked: authorizer.id ? image.isLikedBy(authorizer.id) : false,
     });
   }
@@ -101,13 +124,23 @@ exports.create = async (req, res) => {
     return res.status(500).json({ message: 'Error uploading image' });
   }
 
+  let user;
+  try {
+    user = await User.findById(authorizer.id);
+  } catch (error) {
+    console.error(error.stack); // eslint-disable-line no-console
+    return res.status(500).json({ message: 'Image saved - error formatting image json.' });
+  }
+
   const {
     id, __v, likedBy, ...payload
   } = image.toObject({ virtuals: true });
 
-  payload.isLiked = image.isLikedBy(authorizer.id);
-
-  return res.status(201).json(payload);
+  return res.status(201).json({
+    ...payload,
+    user: safeUser(user),
+    isLiked: image.isLikedBy(authorizer.id),
+  });
 };
 
 exports.update = async (req, res) => {
@@ -117,7 +150,7 @@ exports.update = async (req, res) => {
     params,
   } = req;
 
-  const image = await Image.findById(params.id);
+  const image = await Image.findById(params.id).populate('user comments.author').exec();
 
   if (!image) {
     res.sendStatus(404);
@@ -135,13 +168,17 @@ exports.update = async (req, res) => {
 
     {
       const {
-        id, __v, likedBy, comments, ...payload // eslint-disable-line no-shadow
+        id, __v, likedBy, comments, user, ...payload // eslint-disable-line no-shadow
       } = image.toObject({ virtuals: true });
 
       res.status(200).json({
         ...payload,
+        user: safeUser(user),
         isLiked: image.isLikedBy(authorizer.id),
-        comments: comments.map(({ id, ...comment }) => comment), // eslint-disable-line no-shadow
+        comments: comments.map(({ id, author, ...comment }) => ({ // eslint-disable-line no-shadow
+          ...comment,
+          author: safeUser(author),
+        })),
       });
     }
   }
