@@ -10,6 +10,7 @@ const createToken = (user, expiresIn = '1d') => new Promise((resolve, reject) =>
     firstName: user.firstName,
     lastName: user.lastName,
     avatar: user.avatar,
+    bio: user.bio,
   };
 
   jwt.sign(payload, process.env.JWT_SECRET, { expiresIn }, (err, token) => {

@@ -39,6 +39,9 @@ exports.update = async (req, res) => {
     if (body.lastName) {
       user.set('lastName', body.lastName);
     }
+    if (body.bio) {
+      user.set('bio', body.bio);
+    }
     if (body.password) {
       user.set('password', body.password);
     }

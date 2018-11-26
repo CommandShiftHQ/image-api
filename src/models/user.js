@@ -37,6 +37,10 @@ const userSchema = new mongoose.Schema({
     type: String,
     default: `https://s3-eu-west-1.amazonaws.com/${process.env.S3_BUCKET_NAME}/avatar.jpeg`,
   },
+  bio: {
+    type: String,
+    default: '',
+  },
   access_token: String,
 }, {
   autoIndex: false,
