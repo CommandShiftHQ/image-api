@@ -89,6 +89,7 @@
               <li><code>lastName</code> - string - users email address - required</li>
               <li><code>email</code> - string - users email address - required</li>
               <li><code>password</code> - string - users password - required</li>
+              <li><code>bio</code> - string - users bio - optional - defaults to empty string</li>
               <li><code>avatar</code> - file - profile image. Valid mimetypes include 'image/jpeg', 'image/png' and 'image/gif' - optional</li>
             </ul>
             <h4>Response:</h4>
@@ -104,6 +105,9 @@
               </li>
               <li>
                 <code>avatar</code> - string - URL of users avatar
+              </li>
+              <li>
+                <code>bio</code> - string - users bio
               </li>
               <li>
                 <code>images</code> - array[Image] - array of images - see image endpoints for more details.
@@ -139,6 +143,9 @@
                 <code>avatar</code> - string - URL of users avatar
               </li>
               <li>
+                <code>bio</code> - string - users bio
+              </li>
+              <li>
                 <code>images</code> - array[Images] - array of images belonging to the user - see image endpoints for more details.
               </li>
             </ul>
@@ -171,6 +178,9 @@
                 <code>avatar</code> - string - URL of users avatar
               </li>
               <li>
+                <code>bio</code> - string - users bio
+              </li>
+              <li>
                 <code>images</code> - array[Images] - array of images belonging to the user - see image endpoints for more details.
               </li>
             </ul>
@@ -194,6 +204,7 @@
                 <li><code>firstName</code> - string - users first name - optional</li>
                 <li><code>lastName</code> - string - users email address - optional</li>
                 <li><code>password</code> - string - users password - optional</li>
+                <li><code>bio</code> - string - users bio - optional</li>
                 <li><code>avatar</code> - file - profile image. Valid mimetypes include 'image/jpeg', 'image/png' and 'image/gif' -
                   optional</li>
             </ul>
@@ -213,6 +224,9 @@
               </li>
               <li>
                 <code>avatar</code> - string - URL of users avatar
+              </li>
+              <li>
+                <code>bio</code> - string - users bio
               </li>
               <li>
                 <code>images</code> - array[Image] - array of images belonging to the user - see image endpoints for more details.
