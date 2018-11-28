@@ -23,28 +23,32 @@ exports.create = async (req, res) => {
     body: { content },
   } = req;
 
+  if (!content) {
+    return res.status(400).json({ message: 'Content is required.' });
+  }
+
   const image = await Image.findById(params.id);
 
   const user = await User.findById(authorizer.id);
 
   if (!image) {
-    res.sendStatus(404);
-  } else {
-    const comment = image.comments.create({
-      content,
-      author: authorizer.id,
-      timestamp: moment.utc().valueOf(),
-    });
-
-    image.comments.addToSet(comment);
-
-    await image.save();
-
-    res.status(201).json({
-      ...comment.toObject(),
-      author: safeUser(user.toObject()),
-    });
+    return res.sendStatus(404);
   }
+
+  const comment = image.comments.create({
+    content,
+    author: authorizer.id,
+    timestamp: moment.utc().valueOf(),
+  });
+
+  image.comments.addToSet(comment);
+
+  await image.save();
+
+  return res.status(201).json({
+    ...comment.toObject(),
+    author: safeUser(user.toObject()),
+  });
 };
 
 exports.delete = async (req, res) => {
@@ -56,18 +60,19 @@ exports.delete = async (req, res) => {
   const image = await Image.findById(params.id);
 
   if (!image) {
-    res.sendStatus(404);
-  } else {
-    const comment = image.comments.id(params.commentId);
-
-    if (!comment) {
-      res.sendStatus(404);
-    } else if (comment.author !== authorizer.id) {
-      res.sendStatus(403);
-    } else {
-      comment.remove();
-      await image.save();
-      res.sendStatus(204);
-    }
+    return res.sendStatus(404);
   }
+
+  const comment = image.comments.id(params.commentId);
+
+  if (!comment) {
+    return res.sendStatus(404);
+  }
+  if (comment.author !== authorizer.id) {
+    return res.sendStatus(403);
+  }
+
+  comment.remove();
+  await image.save();
+  return res.sendStatus(204);
 };
