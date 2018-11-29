@@ -194,7 +194,7 @@ exports.delete = async (req, res) => {
 
   if (!image) {
     res.sendStatus(404);
-  } else if (image.user !== authorizer.id) {
+  } else if (!image.user.equals(authorizer.id)) {
     res.sendStatus(403);
   } else {
     await image.remove();
