@@ -68,7 +68,7 @@ exports.delete = async (req, res) => {
   if (!comment) {
     return res.sendStatus(404);
   }
-  if (comment.author !== authorizer.id) {
+  if (!comment.author.equals(authorizer.id)) {
     return res.sendStatus(403);
   }
 
