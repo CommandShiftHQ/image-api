@@ -1,0 +1,78 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: AWS Resources for Manchester Codes Image API
+Parameters:
+  ApplicationName:
+    Type: String
+    Description: Name of your application
+  ImageBucketName:
+    Type: String
+    Description: Name of the S3 bucket where images will be stored
+Resources:
+  ImageBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      BucketName:
+        Ref: ImageBucketName
+      CorsConfiguration:
+        CorsRules:
+          - AllowedHeaders:
+              - Authorization
+            AllowedMethods:
+              - GET
+            AllowedOrigins:
+              - "*"
+            MaxAge: 3000
+      PublicAccessBlockConfiguration:
+        BlockPublicAcls: true
+        BlockPublicPolicy: false
+        IgnorePublicAcls: true
+        RestrictPublicBuckets: false
+  ImageBucketPolicy:
+    Type: AWS::S3::BucketPolicy
+    Properties:
+      Bucket:
+        Ref: ImageBucket
+      PolicyDocument:
+        Version: 2012-10-17
+        Statement:
+          - Effect: Allow
+            Principal: "*"
+            Action:
+              - s3:GetObject
+            Resource:
+              Fn::Join:
+                - ""
+                - - "arn:aws:s3:::"
+                  - Ref: ImageBucket
+                  - "/*"
+  User:
+    Type: AWS::IAM::User
+    Properties:
+      Policies:
+        - PolicyName:
+            Fn::Join:
+              - "-"
+              - - UserS3Access
+                - Ref: ApplicationName
+          PolicyDocument:
+            Version: 2012-10-17
+            Statement:
+              - Effect: Allow
+                Action:
+                  - s3:PutObject
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - "arn:aws:s3:::"
+                      - Ref: ImageBucket
+                      - "/*"
+              - Effect: Allow
+                Action:
+                  - s3:ListBucket
+                Resource:
+                  Fn::Join:
+                    - ""
+                    - - "arn:aws:s3:::"
+                      - Ref: ImageBucket
+      UserName:
+        Ref: ApplicationName
