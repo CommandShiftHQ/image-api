@@ -68,7 +68,9 @@ exports.find = async (req, res) => {
     .select('-password -email -access_token')
     .exec();
 
-  {
+  if (!user) {
+    res.sendStatus(404);
+  } else {
     const { id, __v, ...payload } = user.toObject({ virtuals: true });
 
     res.status(200).json({

@@ -1,0 +1,1096 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Manchester Codes Image Sharing API"
+  },
+  "host": "mcr-codes-image-sharing-api.herokuapp.com",
+  "tags": [
+    {
+      "name": "Authentication"
+    },
+    {
+      "name": "Users"
+    },
+    {
+      "name": "Images"
+    },
+    {
+      "name": "Comments"
+    },
+    {
+      "name": "Likes"
+    }
+  ],
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "readOnly": true,
+          "description": "System assigned id"
+        },
+        "avatar": {
+          "type": "string",
+          "description": "URL of the users profile image"
+        },
+        "bio": {
+          "type": "string",
+          "description": "Users bio"
+        },
+        "email": {
+          "type": "string",
+          "description": "Only present for the authenticated user"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "Users first name"
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Users last name"
+        },
+        "images": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Image"
+          }
+        }
+      }
+    },
+    "Image": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "readOnly": true,
+          "description": "System assigned id"
+        },
+        "user": {
+          "type": {
+            "$ref": "#/definitions/User"
+          },
+          "description": "The user who uploaded the image"
+        },
+        "src": {
+          "type": "string",
+          "description": "URL of the image"
+        },
+        "thumb": {
+          "type": "string",
+          "description": "URL of the image thumbnail"
+        },
+        "caption": {
+          "type": "string",
+          "description": "Image caption"
+        },
+        "tags": {
+          "type": "array",
+          "description": "Array of searchable tags",
+          "items": {
+            "type": "string"
+          }
+        },
+        "comments": {
+          "type": "array",
+          "description": "Array of comments",
+          "items": {
+            "type": {
+              "$ref": "#/definitions/Comment"
+            }
+          }
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Upload time of image in unix milliseconds"
+        },
+        "likes": {
+          "type": "integer",
+          "description": "Number of times the image has been liked"
+        },
+        "isLiked": {
+          "type": "boolean",
+          "description": "true if the authenticated user has liked the image. false if the user has not liked the image, or if there is no authenticated user."
+        }
+      }
+    },
+    "Comment": {
+      "type": "object",
+      "properties": {
+        "_id": {
+          "type": "string",
+          "readOnly": true,
+          "description": "System assigned id"
+        },
+        "author": {
+          "type": {
+            "$ref": "#/definitions/User"
+          },
+          "description": "The user who left the comment"
+        },
+        "content": {
+          "type": "string",
+          "description": "The comment text"
+        },
+        "timestamp": {
+          "type": "string",
+          "description": "Upload time of comment in unix milliseconds"
+        }
+      }
+    }
+  },
+  "paths": {
+    "/auth/login": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logs a user in with an email and password",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "credentials",
+            "description": "Users email and password login credentials",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "email",
+                "password"
+              ],
+              "properties": {
+                "email": {
+                  "type": "string"
+                },
+                "password": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "JWT containing the users details"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/google": {
+      "post": {
+        "tags": [
+          "Authentication"
+        ],
+        "summary": "Logs a user in using Google OAuth",
+        "description": "To authenticate with Google, you should first redirect the user to the following URL:\n`https://accounts.google.com/o/oauth2/v2/auth`\nwith the following query params:\n- `scope`: **https://www.googleapis.com/auth/plus.me https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email**\n- `redirect_uri`: **http://localhost:8080/google-auth**\n - `client_id`: *Ask a tutor for this credential*\n\nThis will redirect back to **/google-auth** your client application with either a code or error query parameter. If a code is returned, this should be forwarded to the **/auth/google** API endpoint. If an error is returned, this should be handled in the client.",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "credentials",
+            "description": "Users Google auth code",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "code"
+              ],
+              "properties": {
+                "code": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "token": {
+                  "type": "string",
+                  "description": "JWT containing the users details"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Creates a new user",
+        "description": "The request body should use the `application/json` `Content-Type` header, unless you are uploading an avatar, in which case `Content-Type` should be `multipart/form-data`",
+        "consumes": [
+          "application/json",
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "firstName",
+            "type": "string",
+            "required": true,
+            "description": "Users first name"
+          },
+          {
+            "in": "formData",
+            "name": "lastName",
+            "type": "string",
+            "required": true,
+            "description": "Users last name"
+          },
+          {
+            "in": "formData",
+            "name": "email",
+            "type": "string",
+            "required": true,
+            "description": "Users email address"
+          },
+          {
+            "in": "formData",
+            "name": "password",
+            "type": "string",
+            "required": true,
+            "description": "Users password"
+          },
+          {
+            "in": "formData",
+            "name": "bio",
+            "type": "string",
+            "required": false,
+            "description": "Users bio"
+          },
+          {
+            "in": "formData",
+            "name": "avatar",
+            "type": "file",
+            "required": false,
+            "description": "Profile image. Valid mimetypes include 'image/jpeg', 'image/png' and 'image/gif'"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Users first name"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Users last name"
+                  },
+                  "email": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Users email address"
+                  },
+                  "password": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Users password"
+                  },
+                  "bio": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Users bio"
+                  }
+                }
+              }
+            },
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "firstName": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Users first name"
+                  },
+                  "lastName": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Users last name"
+                  },
+                  "email": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Users email address"
+                  },
+                  "password": {
+                    "type": "string",
+                    "required": true,
+                    "description": "Users password"
+                  },
+                  "bio": {
+                    "type": "string",
+                    "required": false,
+                    "description": "Users bio"
+                  },
+                  "avatar": {
+                    "type": "string",
+                    "format": "binary",
+                    "required": true,
+                    "description": "Users profile image. Valid mimetypes include 'image/jpeg', 'image/png' and 'image/gif'"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/:id": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Returns the profile of a user with the given ID",
+        "description": "If authorization provided, the returned image data will contain details of whether the authenticated user has liked the image.",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": false,
+            "description": "A valid JWT"
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "ID of the user "
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/User"
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Returns the profile of the authenticated user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "A valid JWT"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/User"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Updates the profile of the authenticated user",
+        "description": "The request body should use the `application/json` `Content-Type` header, unless you are uploading an avatar, in which case `Content-Type` should be `multipart/form-data`",
+        "consumes": [
+          "application/json",
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "A valid JWT"
+          },
+          {
+            "in": "formData",
+            "name": "firstName",
+            "type": "string",
+            "required": false,
+            "description": "Users first name"
+          },
+          {
+            "in": "formData",
+            "name": "lastName",
+            "type": "string",
+            "required": false,
+            "description": "Users last name"
+          },
+          {
+            "in": "formData",
+            "name": "password",
+            "type": "string",
+            "required": false,
+            "description": "Users password"
+          },
+          {
+            "in": "formData",
+            "name": "bio",
+            "type": "string",
+            "required": false,
+            "description": "Users bio"
+          },
+          {
+            "in": "formData",
+            "name": "avatar",
+            "type": "file",
+            "required": false,
+            "description": "Profile image. Valid mimetypes include 'image/jpeg', 'image/png' and 'image/gif'"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "object",
+              "$ref": "#/definitions/User"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Validation error message"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Deletes the profile and all images belonging to the authenticated user",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "A valid JWT"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/images": {
+      "get": {
+        "tags": [
+          "Images"
+        ],
+        "summary": "Returns a list of images, filterable by tags",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": false,
+            "description": "A valid JWT."
+          },
+          {
+            "in": "query",
+            "name": "tags",
+            "description": "Array of tags to filter response by. Only images with matching tags will be returned",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Image"
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Images"
+        ],
+        "summary": "Creates a new image",
+        "consumes": [
+          "multipart/form-data"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "A valid JWT."
+          },
+          {
+            "in": "header",
+            "name": "Content-Type",
+            "type": "string",
+            "required": true,
+            "description": "Must be `multipart/form-data`"
+          },
+          {
+            "in": "formData",
+            "name": "caption",
+            "type": "string",
+            "required": true,
+            "description": "Image caption"
+          },
+          {
+            "in": "formData",
+            "name": "tags",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "required": false,
+            "default": [],
+            "description": "Array of searchable tags"
+          },
+          {
+            "in": "formData",
+            "name": "image",
+            "type": "file",
+            "required": true,
+            "description": "Valid mimetypes include 'image/jpeg', 'image/png' and 'image/gif'"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Image"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Validation error message"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/images/:id": {
+      "get": {
+        "tags": [
+          "Images"
+        ],
+        "summary": "Returns a single image with the given id",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": false,
+            "description": "A valid JWT."
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "ID of the image "
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Image"
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "patch": {
+        "tags": [
+          "Images"
+        ],
+        "summary": "Update the image with the given id",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "A valid JWT."
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "ID of the image "
+          },
+          {
+            "in": "formData",
+            "name": "caption",
+            "type": "string",
+            "required": false,
+            "description": "Image caption"
+          },
+          {
+            "in": "formData",
+            "name": "tags",
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "required": false,
+            "description": "Array of searchable tags"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Image"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - returned if the authorized user is not the image owner"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Images"
+        ],
+        "summary": "Deletes the image",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "A valid JWT."
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "ID of the image "
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - returned if the authorized user is not the image owner"
+          }
+        }
+      }
+    },
+    "/images/:id/comments": {
+      "post": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Adds a comment to an image",
+        "consumes": [
+          "application/json"
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "A valid JWT."
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "ID of the image "
+          },
+          {
+            "in": "body",
+            "name": "comment",
+            "description": "Comment to add",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": [
+                "content"
+              ],
+              "properties": {
+                "content": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Created",
+            "schema": {
+              "$ref": "#/definitions/Comment"
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Validation error message"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/images/:imageId/comments/:commentId": {
+      "delete": {
+        "tags": [
+          "Comments"
+        ],
+        "summary": "Deletes a comment",
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "A valid JWT."
+          },
+          {
+            "in": "path",
+            "name": "imageId",
+            "type": "string",
+            "required": true,
+            "description": "ID of the image "
+          },
+          {
+            "in": "path",
+            "name": "commentId",
+            "type": "string",
+            "required": true,
+            "description": "ID of the comment "
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "No Content"
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - the authenticated user is not the comment owner"
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/images/:id/likes": {
+      "patch": {
+        "tags": [
+          "Likes"
+        ],
+        "summary": "Likes or unlikes an image",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "in": "header",
+            "name": "Authorization",
+            "type": "string",
+            "required": true,
+            "description": "A valid JWT."
+          },
+          {
+            "in": "path",
+            "name": "id",
+            "type": "string",
+            "required": true,
+            "description": "ID of the image "
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "schema": {
+              "$ref": "#/definitions/Image"
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "string",
+                  "description": "Error message"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found"
+          }
+        }
+      }
+    }
+  }
+}
