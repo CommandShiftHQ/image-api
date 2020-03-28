@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const morgan = require('morgan');
+const path = require('path');
 const swagger = require('swagger-ui-express');
 const routes = require('./routes');
 const { authenticate } = require('./middleware/authenticate');
@@ -15,12 +16,13 @@ if (process.env.NODE_ENV !== 'production') {
 
 app.use(cors());
 app.use(express.json());
+app.use(express.static(path.resolve(__dirname, './public')));
 
 app.use('/auth', routes.auth);
 app.use('/users', routes.users);
 app.use('/images', routes.images);
 app.use('/me', authenticate, routes.me);
-app.use('/', swagger.serve, swagger.setup(docs, { swaggerOptions: { defaultModelRendering: 'model' } }));
+app.use('/docs', swagger.serve, swagger.setup(docs, { swaggerOptions: { defaultModelRendering: 'model' } }));
 
 app.use((err, req, res, next) => { // eslint-disable-line no-unused-vars
   console.log(err.stack); // eslint-disable-line no-console
