@@ -64,27 +64,34 @@ exports.create = async (req, res) => {
 exports.find = async (req, res) => {
   const { params, authorizer } = req;
   const user = await User.findById(params.id)
-    .populate('images')
-    .select('-password -email -access_token')
+    .populate({
+      path: 'images',
+      select: '-__v',
+      populate: {
+        path: 'comments.author',
+        select: '-email -password -__v -access_token',
+      },
+    })
+    .select('-password -email -access_token -__v')
     .exec();
 
   if (!user) {
     res.sendStatus(404);
   } else {
-    const { id, __v, ...payload } = user.toObject({ virtuals: true });
+    {
+      const payload = user.toObject({ virtuals: true });
 
-    res.status(200).json({
-      ...payload,
-      images: user.images.map((image) => {
-        const {
-          id, __v, likedBy, ...img // eslint-disable-line no-shadow
-        } = image.toObject({ virtuals: true });
+      res.status(200).json({
+        ...payload,
+        images: user.images.map((image) => {
+          const { likedBy, ...img } = image.toObject({ virtuals: true });
 
-        return {
-          ...img,
-          isLiked: authorizer.id ? image.isLikedBy(authorizer.id) : false,
-        };
-      }),
-    });
+          return {
+            ...img,
+            isLiked: authorizer.id ? image.isLikedBy(authorizer.id) : false,
+          };
+        }),
+      });
+    }
   }
 };
