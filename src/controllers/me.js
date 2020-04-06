@@ -5,19 +5,21 @@ const ImageUtils = require('../lib/images');
 exports.profile = async (req, res) => {
   const { authorizer } = req;
   const user = await User.findById(authorizer.id)
-    .populate('images')
-    .select('-password -access_token')
+    .populate({
+      path: 'images',
+      select: '-__v',
+      populate: {
+        path: 'comments.author',
+        select: '-email -password -__v -access_token',
+      },
+    })
+    .select('-password -access_token -__v')
     .exec();
 
   if (!user) {
     res.sendStatus(404);
   } else {
-    {
-      const { id, __v, ...payload } = user.toObject({
-        virtuals: true,
-      });
-      res.status(200).json(payload);
-    }
+    res.status(200).json(user.toObject({ virtuals: true }));
   }
 };
 
