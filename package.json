@@ -12,7 +12,7 @@
   "private": true,
   "license": "ISC",
   "dependencies": {
-    "aws-sdk": "^2.365.0",
+    "aws-sdk": "^2.814.0",
     "bcrypt": "^4.0.1",
     "cors": "^2.8.5",
     "express": "^4.16.4",
